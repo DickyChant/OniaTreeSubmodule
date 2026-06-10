@@ -61,3 +61,24 @@ python3 analysis/analyze_oniatree.py Oniatree*.root         # counting + trigger
 Headline numbers from 282k events (run 402536): N(J/psi) = 25856 +- 179 (sigma_m = 36 MeV);
 sWeighted yields pT 1-2 GeV: 65.6 +- 15.9, pT 2-3: 92.1 +- 18.1, pT < 1: 7.0 +- 6.6;
 low-pT signal concentrated at |y| > 1.6 (pT<3 forward: 143.1 +- 22.0, ~6.5 sigma).
+
+## MiniAOD variant (this branch)
+
+`HiAnalysis/HiOnia/test/oniatree_pp2026_ParkingDoubleMuonLowMass_MiniAOD_cfg.py` runs the
+identical zero-pT-cut selection on MINIAOD (slimmedMuons via `changeToMiniAOD()`), e.g. for
+PDs 1-7 which have no AOD tier.
+
+Measured on the same run 402536 (282,137 events) against the AOD workflow:
+
+| quantity | AOD | MiniAOD | Mini/AOD |
+|---|---|---|---|
+| N(J/psi) total | 25856 +- 179 | 25725 +- 176 | 0.995 |
+| sWeighted pT 2-3 GeV | 92.1 +- 18.1 | 92.3 +- 15.8 | 1.00 |
+| sWeighted pT 1-2 GeV | 65.6 +- 15.9 | 43.8 +- 12.5 | 0.67 |
+| slice fit pT < 1 GeV | 7.3 +- 6.2 | 2.9 +- 3.7 | ~0.4 (low stats) |
+| slice fit pT < 3, \|y\| > 1.6 | 143.1 +- 22.0 | 116.0 +- 18.2 | 0.81 |
+
+Cause: MiniAOD slimming keeps only PF muons below 3 GeV
+(`pt>5 || isPFMuon || (pt>3 && (isGlobalMuon || isStandAloneMuon || numberOfMatches>0 || RPCMuLoose))`),
+so non-PF tracker muons from very soft J/psi daughters are dropped. MiniAOD is fine down to
+~2 GeV (with even less combinatorial background); below that AOD is the gold standard.
