@@ -82,3 +82,7 @@ Cause: MiniAOD slimming keeps only PF muons below 3 GeV
 (`pt>5 || isPFMuon || (pt>3 && (isGlobalMuon || isStandAloneMuon || numberOfMatches>0 || RPCMuLoose))`),
 so non-PF tracker muons from very soft J/psi daughters are dropped. MiniAOD is fine down to
 ~2 GeV (with even less combinatorial background); below that AOD is the gold standard.
+
+Single-muon level (`analysis/compare_muon_pt.py`): Mini/AOD muon ratio is exactly 1.000
+above the pT=3 GeV slimming threshold, ~0.64 at 1-2 GeV (PF-only region), ~0.90 at 2-3 GeV;
+J/psi daughters (dimuon pT<3) lose ~half the muons at 1.25-2 GeV.
