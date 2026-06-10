@@ -46,9 +46,13 @@ def onia2MuMuPAT(process, GlobalTag, MC=False, HLT='HLT', Filter=True, useL1Stag
     process.muonMatchHLTL3.matchedCuts = cms.string('coll("hltIterL3MuonCandidatesPPOnAA")')
     process.muonMatchHLTL2.matchedCuts = cms.string('coll("hltL2MuonCandidatesPPOnAA")')
 
-    from HLTrigger.Configuration.HLT_FULL_cff import fragment
-    process.hltESPSteppingHelixPropagatorAlong = fragment.hltESPSteppingHelixPropagatorAlong
-    process.hltESPSteppingHelixPropagatorOpposite = fragment.hltESPSteppingHelixPropagatorOpposite
+    # HLT_FULL_cff was dropped from CMSSW_16_0_X; clone the standard SteppingHelix
+    # propagators under the hltESP names expected by muonL1Info/muonMatchHLTL1
+    from TrackPropagation.SteppingHelixPropagator.SteppingHelixPropagatorAlong_cfi import SteppingHelixPropagatorAlong as _SHPAlong
+    from TrackPropagation.SteppingHelixPropagator.SteppingHelixPropagatorOpposite_cfi import SteppingHelixPropagatorOpposite as _SHPOpposite
+    process.load("TrackPropagation.SteppingHelixPropagator.SteppingHelixPropagatorAny_cfi")
+    process.hltESPSteppingHelixPropagatorAlong = _SHPAlong.clone(ComponentName = 'hltESPSteppingHelixPropagatorAlong')
+    process.hltESPSteppingHelixPropagatorOpposite = _SHPOpposite.clone(ComponentName = 'hltESPSteppingHelixPropagatorOpposite')
 
     process.muonL1Info.maxDeltaR = 0.3
     process.muonL1Info.maxDeltaEta   = 0.2
