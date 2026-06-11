@@ -70,3 +70,13 @@ N(J/psi) = 12.75M +- 4k; pT 1-2 GeV: 16999 +- 299 (57 sigma); pT<3 forward: 6257
 central: 2001 +- 120; **pT < 1 GeV: 225 +- 134 (1.7 sigma) — not significant even at full
 statistics**. The J/psi spectrum turns on at ~1 GeV: pT->0 is blocked by acceptance+trigger,
 not statistics. Use the pT>1 forward sample for measurements; pT<1 needs a dedicated trigger.
+
+## HLT audit (run 402536 menu from ConfDB)
+
+The open dimuon paths (Dimuon0_LowMass*, Mu0_L1DoubleMu) have NO explicit muon-pT cut at any
+HLT level (L1/L2/L3 MinPt=0, MinPtPair=0). The 1 GeV J/psi turn-on is muon-station
+penetration acceptance (barrel pT>~3, endcap p>~2.5-4 => forward pT floor ~0.7-1.5 GeV, both
+daughters simultaneously). Bandwidth: HLT_Dimuon0_LowMass_Inclusive has HLT prescale 0
+(disabled) in nominal physics columns (live only in low-PU columns); Dimuon0_LowMass PS=2 with
+L1_DoubleMu0_SQ_OS seed (L1-prescaled on top); DoubleMu2_Jpsi_LowPt is unprescaled but cuts
+mu pT>2 with eta-restricted L1 seeds. See analysis/extract_hlt_cuts.py.
