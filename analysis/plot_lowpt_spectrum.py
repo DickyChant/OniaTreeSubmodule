@@ -13,6 +13,28 @@ ROOT.gROOT.SetBatch(True)
 ROOT.gStyle.SetOptStat(0)
 ROOT.RooMsgService.instance().setGlobalKillBelow(ROOT.RooFit.WARNING)
 
+try:
+    import cmsstyle as CMS
+    CMS.setCMSStyle()
+    CMS.SetExtraText("Preliminary")
+    try:
+        CMS.SetEnergy("13.6")
+        CMS.SetLumi("")
+    except Exception:
+        pass
+    HAVE_CMS = True
+except ImportError:
+    HAVE_CMS = False
+
+
+def cms_stamp(canv):
+    if HAVE_CMS:
+        try:
+            CMS.CMS_lumi(canv, 11)
+        except Exception:
+            pass
+    canv.RedrawAxis()
+
 fin, prefix = sys.argv[1], sys.argv[2]
 EXTRA_CUT = sys.argv[3] if len(sys.argv) > 3 else ""
 M_LO, M_HI, NB = 2.2, 4.4, 220
@@ -36,7 +58,11 @@ h01 = df.Filter("pt < 1").Histo1D(
     ("h01", "p_{T}(#mu#mu) 0-1 GeV;m_{#mu#mu} [GeV];Candidates / 10 MeV", NB, M_LO, M_HI), "mass")
 
 mass = ROOT.RooRealVar("mass", "m_{#mu#mu}", M_LO, M_HI, "GeV")
-c = ROOT.TCanvas("c", "", 900, 700)
+c = ROOT.TCanvas("c", "", 800, 700)
+c.SetLeftMargin(0.16)
+c.SetRightMargin(0.05)
+c.SetTopMargin(0.07)
+c.SetBottomMargin(0.12)
 
 
 def fit_hist(h, label, draw=False, sigma0=0.045, fix_shape=False):
@@ -77,12 +103,16 @@ def fit_hist(h, label, draw=False, sigma0=0.045, fix_shape=False):
                    ROOT.RooFit.LineStyle(ROOT.kDashed), ROOT.RooFit.LineColor(ROOT.kRed))
         mod.plotOn(fr, ROOT.RooFit.Components("sig2_" + label),
                    ROOT.RooFit.LineStyle(ROOT.kDotted), ROOT.RooFit.LineColor(ROOT.kGreen + 2))
+        fr.GetYaxis().SetTitleOffset(1.55)
         fr.Draw()
         tx = ROOT.TLatex()
         tx.SetNDC()
-        tx.SetTextSize(0.04)
-        tx.DrawLatex(0.15, 0.84, "N_{J/#psi} = %.0f #pm %.0f" % (ns.getVal(), ns.getError()))
-        tx.DrawLatex(0.15, 0.78, "#sigma_{m} = %.1f MeV" % (1000 * sg.getVal()))
+        tx.SetTextFont(42)
+        tx.SetTextSize(0.038)
+        tx.DrawLatex(0.20, 0.72, h.GetTitle())
+        tx.DrawLatex(0.20, 0.66, "N_{J/#psi} = %.0f #pm %.0f" % (ns.getVal(), ns.getError()))
+        tx.DrawLatex(0.20, 0.60, "#sigma_{m} = %.1f MeV" % (1000 * sg.getVal()))
+        cms_stamp(c)
         c.SaveAs(prefix + "_massfit_" + label + ".png")
     return ns.getVal(), ns.getError()
 
@@ -115,12 +145,15 @@ g.SetLineWidth(2)
 
 c.SetLogy(1)
 g.SetMinimum(5)
+g.GetYaxis().SetTitleOffset(1.55)
 g.Draw("AP")
 tx = ROOT.TLatex()
 tx.SetNDC()
-tx.SetTextSize(0.035)
-tx.DrawLatex(0.45, 0.25, "Run2026C ParkingDoubleMuonLowMass0 AOD (144M evts)")
+tx.SetTextFont(42)
+tx.SetTextSize(0.033)
+tx.DrawLatex(0.45, 0.25, "ParkingDoubleMuonLowMass0 AOD (144M evts)")
 tx.DrawLatex(0.45, 0.20, "p_{T} < 1 GeV: consistent with zero")
+cms_stamp(c)
 c.SaveAs(prefix + "_yield_vs_pt_log.png")
 
 c.SetLogy(0)
@@ -128,10 +161,12 @@ g2 = g.Clone("g2")
 g2.GetXaxis().SetRangeUser(0., 3.)
 g2.SetMaximum(1.25 * max(gy[:6]))
 g2.SetMinimum(-2000)
+g2.GetYaxis().SetTitleOffset(1.55)
 g2.Draw("AP")
 ln = ROOT.TLine(0., 0., 3., 0.)
 ln.SetLineStyle(2)
 ln.Draw()
-tx.DrawLatex(0.18, 0.84, "J/#psi yield turn-on at p_{T} #approx 1 GeV")
+tx.DrawLatex(0.20, 0.72, "J/#psi yield turn-on at p_{T} #approx 1 GeV")
+cms_stamp(c)
 c.SaveAs(prefix + "_yield_vs_pt_zoom.png")
 print("plots written with prefix", prefix)
