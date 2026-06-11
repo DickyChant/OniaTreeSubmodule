@@ -86,3 +86,13 @@ so non-PF tracker muons from very soft J/psi daughters are dropped. MiniAOD is f
 Single-muon level (`analysis/compare_muon_pt.py`): Mini/AOD muon ratio is exactly 1.000
 above the pT=3 GeV slimming threshold, ~0.64 at 1-2 GeV (PF-only region), ~0.90 at 2-3 GeV;
 J/psi daughters (dimuon pT<3) lose ~half the muons at 1.25-2 GeV.
+
+## High-statistics MiniAOD campaign (41.3M events, all 8 PDs)
+
+With `lowPtPreFilter=1` (3.7 kHz aggregate on a 12-core desktop), 41.3M events of 2026C
+MiniAOD across all 8 PDs gave N(J/psi) = 157248 +- 756 in the prefiltered tree:
+pT 1-2 GeV: 4915 +- 151 (33 sigma); pT 2-3: 14056 +- 199; pT<3 forward |y|>1.6:
+18229 +- 248; central: 437 +- 56 (7.9 sigma); **pT < 1 GeV: 31 +- 54 — consistent with
+zero** (rate < ~3 J/psi per M events at 95% CL). Conclusion: MiniAOD fully recovers
+pT 1-3 GeV with statistics, but pT < 1 GeV needs AOD (no PF-only slimming) and/or a
+dedicated trigger.
