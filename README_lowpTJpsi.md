@@ -61,3 +61,12 @@ python3 analysis/analyze_oniatree.py Oniatree*.root         # counting + trigger
 Headline numbers from 282k events (run 402536): N(J/psi) = 25856 +- 179 (sigma_m = 36 MeV);
 sWeighted yields pT 1-2 GeV: 65.6 +- 15.9, pT 2-3: 92.1 +- 18.1, pT < 1: 7.0 +- 6.6;
 low-pT signal concentrated at |y| > 1.6 (pT<3 forward: 143.1 +- 22.0, ~6.5 sigma).
+
+## Full PD0 AOD result (CRAB, 144.4M events)
+
+The CRAB template ran the full /ParkingDoubleMuonLowMass0/Run2026C-PromptReco-v1/AOD
+(727 jobs). Best-candidate skim (analysis/skim_bestcand.py, RDataFrame) + sPlot:
+N(J/psi) = 12.75M +- 4k; pT 1-2 GeV: 16999 +- 299 (57 sigma); pT<3 forward: 62579 +- 488;
+central: 2001 +- 120; **pT < 1 GeV: 225 +- 134 (1.7 sigma) — not significant even at full
+statistics**. The J/psi spectrum turns on at ~1 GeV: pT->0 is blocked by acceptance+trigger,
+not statistics. Use the pT>1 forward sample for measurements; pT<1 needs a dedicated trigger.

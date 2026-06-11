@@ -32,8 +32,23 @@ pt = ROOT.RooRealVar("pt", "p_{T}^{#mu#mu}", 0., 200., "GeV")
 absy = ROOT.RooRealVar("absy", "|y|^{#mu#mu}", 0., 2.5)
 data = ROOT.RooDataSet("data", "best J/psi candidates", ROOT.RooArgSet(mass, pt, absy))
 
-nbest = 0
-for ev in ch:
+# Flat skim input (from skim_bestcand.py): import via numpy, skip the event loop
+# (the RooDataSet-from-TTree constructor was removed in ROOT 6.36)
+_f0 = ROOT.TFile.Open(files[0])
+if _f0.Get("bestcand"):
+    _f0.Close()
+    import numpy as np
+    _arr = ROOT.RDataFrame("bestcand", files).AsNumpy(("mass", "pt", "absy"))
+    _sel = _arr["pt"] < 200.
+    _np = {k: v[_sel].astype(np.float64) for k, v in _arr.items()}
+    data = ROOT.RooDataSet.from_numpy(_np, ROOT.RooArgSet(mass, pt, absy), name="data")
+    nbest = data.numEntries()
+    ch = None
+else:
+    _f0.Close()
+
+nbest = 0 if ch is not None else nbest
+for ev in (ch if ch is not None else []):
     best_i, best_vp = -1, -1.
     for i in range(ev.Reco_QQ_size):
         if ev.Reco_QQ_sign[i] != 0:
