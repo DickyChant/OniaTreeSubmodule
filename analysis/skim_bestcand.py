@@ -19,7 +19,7 @@ int bestIdx(const ROOT::RVec<float>& m, const ROOT::RVec<float>& vp,
             const ROOT::RVec<short>& sign) {
   int ib = -1; float bv = 0.01;
   for (size_t i = 0; i < m.size(); ++i)
-    if (sign[i] == 0 && vp[i] > bv && m[i] > 2.6 && m[i] < 3.5) { bv = vp[i]; ib = i; }
+    if (sign[i] == 0 && vp[i] > bv && m[i] > 2.2 && m[i] < 4.4) { bv = vp[i]; ib = i; }
   return ib;
 }
 """)
