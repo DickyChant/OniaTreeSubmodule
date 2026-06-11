@@ -32,6 +32,10 @@ options = VarParsing.VarParsing('analysis')
 options.register('nThreads', 1, VarParsing.VarParsing.multiplicity.singleton,
                  VarParsing.VarParsing.varType.int,
                  "number of threads/streams (keep 1 for CRAB unless JobType.numCores matches)")
+options.register('lowPtPreFilter', 0, VarParsing.VarParsing.multiplicity.singleton,
+                 VarParsing.VarParsing.varType.int,
+                 "require an OS slimmedMuons pair with 2.5<m<3.6 && pT<4 before the PAT chain"
+                 " (fast skim mode for mass low-pT processing)")
 options.inputFiles = [
     'file:/eos/cms/store/data/Run2026C/ParkingDoubleMuonLowMass0/MINIAOD/PromptReco-v1/000/402/536/00000/b7874954-503b-4f93-9a65-7b98cf3566e4.root',
 ]
@@ -131,10 +135,28 @@ if miniAOD:
     changeToMiniAOD(process)
     process.unpackedMuons.addPropToMuonSt = cms.bool(UsePropToMuonSt)
 
+# Fast skim mode: cheap dimuon-mass prefilter on slimmedMuons rejects ~98% of
+# events before the PAT chain. Reco-based (not trigger-based), so events where a
+# low-pT J/psi rides in on another parking trigger are kept.
+if options.lowPtPreFilter:
+    process.lowPtDimuCands = cms.EDProducer("CandViewShallowCloneCombiner",
+        decay = cms.string("slimmedMuons@+ slimmedMuons@-"),
+        checkCharge = cms.bool(True),
+        cut = cms.string("2.5 < mass && mass < 3.6 && pt < 4.0"),
+    )
+    process.lowPtDimuFilter = cms.EDFilter("CandViewCountFilter",
+        src = cms.InputTag("lowPtDimuCands"),
+        minNumber = cms.uint32(1),
+    )
+    process.oniaTreeAna.replace(
+        process.patMuonSequence,
+        cms.Sequence(process.lowPtDimuCands * process.lowPtDimuFilter) * process.patMuonSequence)
+
 #----------------------------------------------------------------------------
 
 process.source = cms.Source("PoolSource",
     fileNames = cms.untracked.vstring(options.inputFiles),
+    skipBadFiles = cms.untracked.bool(True),
 )
 process.TFileService = cms.Service("TFileService",
     fileName = cms.string(options.outputFile),
